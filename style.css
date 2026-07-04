@@ -11,6 +11,7 @@ body {
     min-height: 100vh;
     display: flex;
     justify-content: center;
+    align-items: flex-start;
 }
 
 #app {
@@ -23,10 +24,7 @@ body {
     transition: all 0.2s;
 }
 
-@media (max-width: 480px) {
-    #app { padding: 20px 16px; }
-}
-
+/* ===== ЗАГОЛОВКИ ===== */
 h1 {
     font-size: 28px;
     font-weight: 700;
@@ -45,6 +43,7 @@ h1 small {
     color: #54708f;
 }
 
+/* ===== КАРТОЧКИ ===== */
 .card {
     background: #ffffff;
     border-radius: 24px;
@@ -59,6 +58,7 @@ h1 small {
     justify-content: space-between;
     align-items: center;
     flex-wrap: wrap;
+    gap: 12px;
     margin-bottom: 16px;
 }
 
@@ -68,6 +68,7 @@ h1 small {
     color: #1a2c4a;
 }
 
+/* ===== ФОРМЫ И КНОПКИ ===== */
 .flex-row {
     display: flex;
     flex-wrap: wrap;
@@ -79,6 +80,7 @@ h1 small {
     flex: 1 1 300px;
     display: flex;
     gap: 8px;
+    min-width: 200px;
 }
 
 .input-group input {
@@ -90,6 +92,7 @@ h1 small {
     background: #f9fafc;
     transition: 0.2s;
     outline: none;
+    min-width: 120px;
 }
 
 .input-group input:focus {
@@ -110,12 +113,21 @@ h1 small {
     transition: 0.15s;
     display: inline-flex;
     align-items: center;
+    justify-content: center;
     gap: 6px;
     white-space: nowrap;
+    min-height: 44px;
 }
 
-.btn:hover { background: #1a56c4; transform: scale(0.97); }
-.btn:disabled { opacity: 0.5; pointer-events: none; }
+.btn:hover { 
+    background: #1a56c4; 
+    transform: scale(0.97); 
+}
+
+.btn:disabled { 
+    opacity: 0.5; 
+    pointer-events: none; 
+}
 
 .btn-outline {
     background: transparent;
@@ -123,14 +135,28 @@ h1 small {
     border: 1px solid #d0d9e6;
 }
 
-.btn-outline:hover { background: #eef3f9; }
+.btn-outline:hover { 
+    background: #eef3f9; 
+    transform: scale(0.97);
+}
 
-.btn-success { background: #1a9e6b; }
-.btn-success:hover { background: #15835a; }
+.btn-success { 
+    background: #1a9e6b; 
+}
 
-.btn-danger { background: #d1435a; }
-.btn-danger:hover { background: #b62d44; }
+.btn-success:hover { 
+    background: #15835a; 
+}
 
+.btn-danger { 
+    background: #d1435a; 
+}
+
+.btn-danger:hover { 
+    background: #b62d44; 
+}
+
+/* ===== КНОПКА УДАЛЕНИЯ ===== */
 .btn-delete {
     background: transparent;
     color: #999;
@@ -146,6 +172,7 @@ h1 small {
     align-items: center;
     justify-content: center;
     line-height: 1;
+    flex-shrink: 0;
 }
 
 .btn-delete:hover {
@@ -154,6 +181,7 @@ h1 small {
     transform: scale(1.1);
 }
 
+/* ===== СТАТУСЫ ===== */
 .status-badge {
     display: inline-block;
     padding: 6px 16px;
@@ -162,12 +190,25 @@ h1 small {
     font-weight: 500;
     background: #eef2f6;
     color: #1f3a5f;
+    white-space: nowrap;
 }
 
-.badge-success { background: #e1f5ed; color: #0a6b4a; }
-.badge-warning { background: #fff1d9; color: #a8691e; }
-.badge-danger { background: #fde7ea; color: #b12f44; }
+.badge-success { 
+    background: #e1f5ed; 
+    color: #0a6b4a; 
+}
 
+.badge-warning { 
+    background: #fff1d9; 
+    color: #a8691e; 
+}
+
+.badge-danger { 
+    background: #fde7ea; 
+    color: #b12f44; 
+}
+
+/* ===== СПИННЕР ===== */
 .spinner {
     display: inline-block;
     width: 20px;
@@ -178,8 +219,11 @@ h1 small {
     animation: spin 0.7s linear infinite;
 }
 
-@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes spin { 
+    to { transform: rotate(360deg); } 
+}
 
+/* ===== ОТЧЁТ ===== */
 .report-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
@@ -196,15 +240,26 @@ h1 small {
     justify-content: space-between;
     align-items: center;
     transition: 0.1s;
+    gap: 8px;
 }
 
-.report-item .label { font-weight: 500; color: #1f3a5f; }
-.report-item .status { font-weight: 600; font-size: 15px; }
+.report-item .label { 
+    font-weight: 500; 
+    color: #1f3a5f;
+    font-size: 14px;
+}
+
+.report-item .status { 
+    font-weight: 600; 
+    font-size: 14px;
+    white-space: nowrap;
+}
 
 .status-found { color: #1a9e6b; }
 .status-missing { color: #d1435a; }
 .status-partial { color: #d48c2b; }
 
+/* ===== ИСТОРИЯ ===== */
 .history-list {
     display: flex;
     flex-direction: column;
@@ -229,12 +284,15 @@ h1 small {
     color: #0b1e3a;
     flex: 1;
     min-width: 150px;
+    word-break: break-all;
+    font-size: 14px;
 }
 
 .history-item .date { 
     color: #54708f; 
-    font-size: 14px;
+    font-size: 13px;
     margin-right: 4px;
+    white-space: nowrap;
 }
 
 .history-item .status-wrapper {
@@ -249,6 +307,7 @@ h1 small {
     align-items: center;
 }
 
+/* ===== ФИЛЬТРЫ ===== */
 .filter-group {
     display: flex;
     gap: 8px;
@@ -263,6 +322,8 @@ h1 small {
     font-size: 13px;
     cursor: pointer;
     transition: 0.1s;
+    white-space: nowrap;
+    min-height: 32px;
 }
 
 .filter-btn.active {
@@ -271,6 +332,11 @@ h1 small {
     border-color: #2e6edf;
 }
 
+.filter-btn:hover:not(.active) {
+    background: #eef3f9;
+}
+
+/* ===== РЕКОМЕНДАЦИИ ===== */
 .recommend {
     background: #fcf6e8;
     padding: 14px 18px;
@@ -279,9 +345,17 @@ h1 small {
     margin-top: 14px;
 }
 
-.recommend ul { padding-left: 20px; margin: 6px 0; }
-.recommend li { margin-bottom: 4px; }
+.recommend ul { 
+    padding-left: 20px; 
+    margin: 6px 0; 
+}
 
+.recommend li { 
+    margin-bottom: 4px;
+    font-size: 14px;
+}
+
+/* ===== УТИЛИТЫ ===== */
 .toggle-detail {
     background: none;
     border: none;
@@ -295,7 +369,10 @@ h1 small {
 .hidden { display: none; }
 .mt-12 { margin-top: 12px; }
 .mb-8 { margin-bottom: 8px; }
-.text-muted { color: #54708f; font-size: 14px; }
+.text-muted { 
+    color: #54708f; 
+    font-size: 14px; 
+}
 
 .footer-actions {
     display: flex;
@@ -304,18 +381,433 @@ h1 small {
     margin-top: 16px;
 }
 
-@media (max-width: 600px) {
-    .report-grid { grid-template-columns: 1fr; }
-    .history-item { 
-        flex-direction: column; 
-        align-items: stretch; 
+/* ======================================== */
+/* ===== АДАПТАЦИЯ ДЛЯ ПЛАНШЕТОВ ===== */
+/* ======================================== */
+@media (max-width: 1024px) {
+    #app {
+        padding: 24px 20px;
+    }
+
+    h1 {
+        font-size: 24px;
+    }
+
+    .card {
+        padding: 20px 16px;
+    }
+
+    .report-grid {
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    }
+}
+
+/* ======================================== */
+/* ===== АДАПТАЦИЯ ДЛЯ ТЕЛЕФОНОВ ===== */
+/* ======================================== */
+@media (max-width: 768px) {
+    body {
+        padding: 12px;
+    }
+
+    #app {
+        padding: 16px 12px;
+        border-radius: 20px;
+    }
+
+    h1 {
+        font-size: 20px;
+        gap: 8px;
+        margin-bottom: 16px;
+    }
+
+    h1 small {
+        font-size: 14px;
+        width: 100%;
+    }
+
+    .card {
+        padding: 16px 12px;
+        border-radius: 16px;
+        margin-bottom: 16px;
+    }
+
+    .card-header {
+        flex-direction: column;
+        align-items: flex-start;
         gap: 8px;
     }
+
+    .card-header h2 {
+        font-size: 17px;
+    }
+
+    /* Кнопки и поля ввода */
+    .flex-row {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+    }
+
+    .input-group {
+        flex-direction: column;
+        gap: 8px;
+        min-width: unset;
+    }
+
+    .input-group input {
+        width: 100%;
+        padding: 14px 16px;
+        font-size: 16px; /* Предотвращает масштабирование на iOS */
+        border-radius: 12px;
+    }
+
+    .btn {
+        width: 100%;
+        justify-content: center;
+        padding: 14px 20px;
+        font-size: 16px;
+        min-height: 50px;
+        border-radius: 12px;
+    }
+
+    .btn-outline {
+        width: 100%;
+    }
+
+    /* Статус */
+    .status-badge {
+        font-size: 13px;
+        padding: 4px 14px;
+    }
+
+    /* Отчёт */
+    .report-grid {
+        grid-template-columns: 1fr;
+        gap: 8px;
+    }
+
+    .report-item {
+        padding: 12px 14px;
+        flex-wrap: wrap;
+        gap: 4px;
+    }
+
+    .report-item .label {
+        font-size: 13px;
+        flex: 1;
+    }
+
+    .report-item .status {
+        font-size: 13px;
+    }
+
+    /* История */
+    .history-item {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
+        padding: 12px 14px;
+    }
+
+    .history-item .url {
+        font-size: 13px;
+        min-width: unset;
+        word-break: break-all;
+    }
+
     .history-item .status-wrapper {
         justify-content: space-between;
         width: 100%;
+        flex-wrap: wrap;
     }
+
+    .history-item .date {
+        font-size: 12px;
+    }
+
     .history-item .delete-wrapper {
         align-self: flex-end;
+    }
+
+    .btn-delete {
+        width: 36px;
+        height: 36px;
+        font-size: 20px;
+    }
+
+    /* Фильтры */
+    .filter-group {
+        width: 100%;
+        justify-content: flex-start;
+        gap: 6px;
+    }
+
+    .filter-btn {
+        font-size: 12px;
+        padding: 4px 12px;
+        min-height: 28px;
+        flex: 1;
+        text-align: center;
+        min-width: 60px;
+    }
+
+    /* Рекомендации */
+    .recommend {
+        padding: 12px 14px;
+        font-size: 14px;
+    }
+
+    .recommend ul {
+        padding-left: 16px;
+    }
+
+    .recommend li {
+        font-size: 13px;
+    }
+
+    /* Утилиты */
+    .text-muted {
+        font-size: 13px;
+    }
+}
+
+/* ======================================== */
+/* ===== АДАПТАЦИЯ ДЛЯ МАЛЕНЬКИХ ТЕЛЕФОНОВ ===== */
+/* ======================================== */
+@media (max-width: 480px) {
+    body {
+        padding: 8px;
+    }
+
+    #app {
+        padding: 12px 8px;
+        border-radius: 16px;
+    }
+
+    h1 {
+        font-size: 18px;
+    }
+
+    h1 small {
+        font-size: 12px;
+    }
+
+    .card {
+        padding: 12px 10px;
+        border-radius: 12px;
+        margin-bottom: 12px;
+    }
+
+    .card-header h2 {
+        font-size: 15px;
+    }
+
+    .input-group input {
+        padding: 12px 14px;
+        font-size: 15px;
+        border-radius: 10px;
+    }
+
+    .btn {
+        padding: 12px 16px;
+        font-size: 14px;
+        min-height: 44px;
+        border-radius: 10px;
+    }
+
+    .status-badge {
+        font-size: 12px;
+        padding: 4px 12px;
+    }
+
+    .report-item {
+        padding: 10px 12px;
+        border-left-width: 3px;
+    }
+
+    .report-item .label {
+        font-size: 12px;
+    }
+
+    .report-item .status {
+        font-size: 12px;
+    }
+
+    .history-item {
+        padding: 10px 12px;
+        gap: 6px;
+    }
+
+    .history-item .url {
+        font-size: 12px;
+    }
+
+    .filter-btn {
+        font-size: 11px;
+        padding: 3px 10px;
+        min-height: 24px;
+        min-width: 50px;
+    }
+
+    .recommend {
+        padding: 10px 12px;
+        border-left-width: 3px;
+    }
+
+    .recommend li {
+        font-size: 12px;
+    }
+
+    .text-muted {
+        font-size: 12px;
+    }
+
+    .btn-delete {
+        width: 30px;
+        height: 30px;
+        font-size: 16px;
+    }
+}
+
+/* ======================================== */
+/* ===== ДЛЯ УСТРОЙСТВ С ТАЧ-ЭКРАНОМ ===== */
+/* ======================================== */
+@media (hover: none) {
+    .btn:hover {
+        transform: none;
+    }
+
+    .btn-outline:hover {
+        transform: none;
+    }
+
+    .btn-delete:hover {
+        transform: none;
+        background: transparent;
+    }
+
+    .btn-delete:active {
+        background: #fde7ea;
+        transform: scale(0.9);
+    }
+
+    .filter-btn:hover:not(.active) {
+        background: transparent;
+    }
+
+    .filter-btn:active:not(.active) {
+        background: #eef3f9;
+    }
+}
+
+/* ======================================== */
+/* ===== ДЛЯ ТЕМНОЙ ТЕМЫ (опционально) ===== */
+/* ======================================== */
+@media (prefers-color-scheme: dark) {
+    body {
+        background: #1a1f2e;
+    }
+
+    #app {
+        background: #242a3a;
+        border-color: #2f3649;
+    }
+
+    .card {
+        background: #2a3042;
+        border-color: #363d52;
+    }
+
+    .card-header h2 {
+        color: #d4dcec;
+    }
+
+    .input-group input {
+        background: #1e2436;
+        border-color: #3d455b;
+        color: #d4dcec;
+    }
+
+    .input-group input:focus {
+        background: #252b3e;
+        border-color: #4a6fd4;
+    }
+
+    .btn-outline {
+        color: #d4dcec;
+        border-color: #3d455b;
+    }
+
+    .btn-outline:hover {
+        background: #2f3649;
+    }
+
+    .status-badge {
+        background: #2f3649;
+        color: #d4dcec;
+    }
+
+    .report-item {
+        background: #1e2436;
+        border-left-color: #3d455b;
+    }
+
+    .report-item .label {
+        color: #d4dcec;
+    }
+
+    .history-item {
+        background: #1e2436;
+        border-color: #3d455b;
+    }
+
+    .history-item .url {
+        color: #d4dcec;
+    }
+
+    .history-item .date {
+        color: #8a94a8;
+    }
+
+    .recommend {
+        background: #2a2a3a;
+        border-left-color: #d48c2b;
+    }
+
+    .text-muted {
+        color: #8a94a8;
+    }
+
+    .filter-btn {
+        border-color: #3d455b;
+        color: #d4dcec;
+    }
+
+    .filter-btn.active {
+        background: #2e6edf;
+        border-color: #2e6edf;
+        color: white;
+    }
+
+    .filter-btn:hover:not(.active) {
+        background: #2f3649;
+    }
+
+    .btn-delete {
+        color: #7a84a0;
+    }
+
+    .btn-delete:hover {
+        background: #3a2a32;
+        color: #d1435a;
+    }
+
+    h1 {
+        color: #d4dcec;
+    }
+
+    h1 small {
+        color: #8a94a8;
     }
 }
