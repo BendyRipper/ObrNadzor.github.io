@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Инспектор сайта ОО</title>
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+    <div id="app">
+    <header>
+        <h1>
+            <span>Инспектор сайта ОО</span>
+            <small>Проверка по Приказу № 831</small>
+        </h1>
+    </header>
+<section class="card" id="check-section">
+        <div class="card-header">
+            <h2>🔍 Проверка сайта</h2>
+            <span class="status-badge" id="liveStatus">Готов к проверке</span>
+        </div>
+        <div class="flex-row">
+            <div class="input-group">
+                <input type="url" id="siteUrl" placeholder="https://school.example.ru" value="https://school.example.ru" />
+                <button class="btn" id="checkBtn">Проверить</button>
+            </div>
+            <button class="btn btn-outline" id="clearHistoryBtn">🗑 Очистить историю</button>
+        </div>
+        <div id="loadingIndicator" class="mt-12 hidden">
+            <span class="spinner"></span> Загрузка страницы...
+        </div>
+        <div id="errorMessage" class="mt-12 text-muted hidden" style="color:#d1435a;"></div>
+    </section>
+
+    <section class="card" id="report-section">
+        <div class="card-header">
+            <h2>📋 Отчёт о соответствии</h2>
+            <div class="flex-row">
+                <span id="overallStatus" class="status-badge">—</span>
+                <button class="btn btn-outline" id="exportJsonBtn" disabled>📥 JSON</button>
+                <button class="btn btn-outline" id="exportTextBtn" disabled>📄 Текст</button>
+            </div>
+        </div>
+        <div id="reportContent">
+            <p class="text-muted">После проверки здесь появится отчёт.</p>
+        </div>
+        <div id="recommendationsContainer"></div>
+    </section>
+
+    <section class="card" id="history-section">
+        <div class="card-header">
+            <h2>📜 История проверок</h2>
+            <div class="filter-group" id="filterGroup">
+                <button class="filter-btn active" data-filter="all">Все</button>
+                <button class="filter-btn" data-filter="success">✅ Соответствует</button>
+                <button class="filter-btn" data-filter="warning">⚠️ Частично</button>
+                <button class="filter-btn" data-filter="danger">❌ Не соответствует</button>
+            </div>
+        </div>
+        <div id="historyList">
+            <p class="text-muted">История пуста.</p>
+        </div>
+    </section>
+</div>
+
+    <script src="app.js"></script>
+
+</body>
+</html>
