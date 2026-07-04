@@ -16,6 +16,21 @@
         { id: 'international', label: 'Международное сотрудничество' }
     ];
 
+    // Ключевые слова для поиска подразделов (можно расширять)
+    const SUBSECTION_KEYWORDS = {
+        basic: ['основные сведения', 'общая информация', 'о школе'],
+        structure: ['структура', 'органы управления', 'управление'],
+        documents: ['документы', 'нормативные документы', 'локальные акты'],
+        education: ['образование', 'образовательные программы', 'учебный план'],
+        staff: ['руководство', 'педагогический состав', 'преподаватели', 'учителя'],
+        material: ['материально-техническое', 'оснащение', 'оборудование'],
+        paid: ['платные услуги', 'платные образовательные', 'дополнительные услуги'],
+        finance: ['финансово-хозяйственная', 'финансы', 'бюджет'],
+        vacancies: ['вакантные места', 'прием', 'поступление'],
+        accessible: ['доступная среда', 'инклюзия', 'безбарьерная'],
+        international: ['международное сотрудничество', 'международные']
+    };
+
     // ----- Состояние -----
     let currentReport = null;
     let history = [];
@@ -79,82 +94,208 @@
         localStorage.setItem('inspectorHistory', JSON.stringify(history));
     }
 
-    // ----- Симуляция проверки (замените на реальный парсинг) -----
-    function performInspection(url) {
-        const lower = url.toLowerCase();
-        const foundSections = [];
-        const mainSectionFound = lower.includes('sveden') || lower.includes('edu') || lower.includes('school');
-
-        if (mainSectionFound) {
-            REQUIRED_SUBSECTIONS.forEach((sub) => {
-                const rand = Math.random();
-                let status;
-                if (rand < 0.7) status = 'found';
-                else if (rand < 0.85) status = 'partial';
-                else status = 'missing';
-                foundSections.push({
-                    id: sub.id,
-                    label: sub.label,
-                    status: status,
-                    comment: status === 'found' ? 'Ссылка обнаружена' :
-                             status === 'partial' ? 'Название отличается' : 'Не найдено'
-                });
+    // ----- РЕАЛЬНАЯ ПРОВЕРКА САЙТА (без iframe) -----
+    // Здесь используется fetch + DOMParser для парсинга HTML
+    async function performRealInspection(url) {
+        try {
+            // 1. Загружаем HTML страницы через fetch (прокси может понадобиться)
+            const response = await fetch(url, {
+                mode: 'cors',
+                headers: {
+                    'Accept': 'text/html'
+                }
             });
 
-            const hasBlind = lower.includes('blind') || lower.includes('special') || Math.random() > 0.5;
-            const foundCount = foundSections.filter(s => s.status === 'found').length;
-            const total = foundSections.length;
-            let overall;
-            if (foundCount === total) overall = 'success';
-            else if (foundCount >= total * 0.6) overall = 'warning';
-            else overall = 'danger';
-
-            const recommendations = [];
-            if (foundCount < total) {
-                recommendations.push('Добавьте недостающие подразделы согласно Приказу № 831');
-            }
-            if (!hasBlind) {
-                recommendations.push('Разместите версию для слабовидящих (иконка или текст)');
-            }
-            if (foundSections.some(s => s.status === 'partial')) {
-                recommendations.push('Уточните названия подразделов в соответствии с Приказом');
+            if (!response.ok) {
+                throw new Error(`Ошибка загрузки: ${response.status} ${response.statusText}`);
             }
 
-            return {
-                url,
-                timestamp: new Date().toISOString(),
-                overall,
-                subsections: foundSections,
-                recommendations,
-                mainSectionExists: true,
-                blindVersionExists: hasBlind
-            };
-        } else {
+            const html = await response.text();
+            
+            // 2. Парсим HTML
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+
+            // 3. Ищем все ссылки и заголовки
+            const allLinks = Array.from(doc.querySelectorAll('a'));
+            const allHeadings = Array.from(doc.querySelectorAll('h1, h2, h3'));
+            const allTextContent = [];
+
+            // Собираем весь текст с сайта для поиска
+            doc.querySelectorAll('*').forEach(el => {
+                if (el.textContent) {
+                    allTextContent.push(el.textContent.toLowerCase());
+                }
+            });
+
+            // Собираем текст ссылок и их атрибуты
+            const linkTexts = allLinks.map(link => ({
+                text: link.textContent.toLowerCase(),
+                href: link.getAttribute('href') || '',
+                title: link.getAttribute('title') || ''
+            }));
+
+            const headingTexts = allHeadings.map(h => h.textContent.toLowerCase());
+
+            // Объединяем все тексты для поиска
+            const allTexts = [...allTextContent, ...linkTexts.map(l => l.text), ...headingTexts];
+
+            // 4. Проверяем наличие раздела "Сведения об образовательной организации"
+            const mainSectionKeywords = ['сведения об образовательной организации', 'сведения об оо', 'сведения о школе'];
+            const mainSectionFound = mainSectionKeywords.some(keyword => 
+                allTexts.some(text => text.includes(keyword))
+            );
+
+            const foundSections = [];
+
+            if (mainSectionFound) {
+                // Проверяем каждый обязательный подраздел
+                REQUIRED_SUBSECTIONS.forEach((sub) => {
+                    const keywords = SUBSECTION_KEYWORDS[sub.id] || [sub.label.toLowerCase()];
+                    
+                    // Ищем в тексте ссылок
+                    let found = false;
+                    let partial = false;
+
+                    for (const keyword of keywords) {
+                        // Полное совпадение
+                        const exactMatch = allTexts.some(text => text.includes(keyword));
+                        if (exactMatch) {
+                            found = true;
+                            break;
+                        }
+                        // Частичное совпадение (например, содержит часть слова)
+                        const partialMatch = allTexts.some(text => {
+                            const words = keyword.split(' ');
+                            return words.some(word => word.length > 3 && text.includes(word));
+                        });
+                        if (partialMatch) {
+                            partial = true;
+                        }
+                    }
+
+                    let status;
+                    let comment;
+                    if (found) {
+                        status = 'found';
+                        comment = 'Ссылка или раздел обнаружен';
+                    } else if (partial) {
+                        status = 'partial';
+                        comment = 'Обнаружено частичное совпадение';
+                    } else {
+                        status = 'missing';
+                        comment = 'Не найдено';
+                    }
+
+                    foundSections.push({
+                        id: sub.id,
+                        label: sub.label,
+                        status: status,
+                        comment: comment
+                    });
+                });
+
+                // Проверяем наличие версии для слабовидящих
+                const blindKeywords = ['версия для слабовидящих', 'для слабовидящих', 'увеличительное стекло', 'лупа'];
+                const hasBlind = blindKeywords.some(keyword =>
+                    allTexts.some(text => text.includes(keyword))
+                );
+
+                // Подсчитываем результат
+                const foundCount = foundSections.filter(s => s.status === 'found').length;
+                const total = foundSections.length;
+                let overall;
+                if (foundCount === total) overall = 'success';
+                else if (foundCount >= total * 0.6) overall = 'warning';
+                else overall = 'danger';
+
+                // Формируем рекомендации
+                const recommendations = [];
+                const missingSections = foundSections.filter(s => s.status === 'missing');
+                const partialSections = foundSections.filter(s => s.status === 'partial');
+
+                if (missingSections.length > 0) {
+                    const names = missingSections.map(s => s.label).join(', ');
+                    recommendations.push(`Добавьте подразделы: ${names}`);
+                }
+
+                if (partialSections.length > 0) {
+                    const names = partialSections.map(s => s.label).join(', ');
+                    recommendations.push(`Уточните названия подразделов: ${names}`);
+                }
+
+                if (!hasBlind) {
+                    recommendations.push('Разместите версию для слабовидящих (иконка или текст)');
+                }
+
+                if (!mainSectionFound) {
+                    recommendations.push('Создайте специальный раздел «Сведения об образовательной организации»');
+                }
+
+                return {
+                    url,
+                    timestamp: new Date().toISOString(),
+                    overall,
+                    subsections: foundSections,
+                    recommendations,
+                    mainSectionExists: mainSectionFound,
+                    blindVersionExists: hasBlind
+                };
+
+            } else {
+                // Если раздел не найден
+                const subsections = REQUIRED_SUBSECTIONS.map(s => ({
+                    id: s.id,
+                    label: s.label,
+                    status: 'missing',
+                    comment: 'Раздел не найден'
+                }));
+
+                return {
+                    url,
+                    timestamp: new Date().toISOString(),
+                    overall: 'danger',
+                    subsections,
+                    recommendations: ['Создайте специальный раздел «Сведения об образовательной организации»'],
+                    mainSectionExists: false,
+                    blindVersionExists: false
+                };
+            }
+
+        } catch (error) {
+            // Обработка ошибок загрузки
+            console.error('Ошибка при загрузке сайта:', error);
+            
+            // Возвращаем отчёт с ошибкой
             const subsections = REQUIRED_SUBSECTIONS.map(s => ({
                 id: s.id,
                 label: s.label,
                 status: 'missing',
-                comment: 'Раздел не найден'
+                comment: 'Ошибка загрузки: ' + error.message
             }));
+
             return {
                 url,
                 timestamp: new Date().toISOString(),
                 overall: 'danger',
                 subsections,
-                recommendations: ['Создайте специальный раздел «Сведения об образовательной организации»'],
+                recommendations: [`Не удалось загрузить сайт: ${error.message}. Проверьте CORS или используйте прокси-сервер.`],
                 mainSectionExists: false,
-                blindVersionExists: false
+                blindVersionExists: false,
+                error: error.message
             };
         }
     }
 
-    // ----- Основная проверка -----
-    function runCheck(url) {
+    // ----- Основная проверка (асинхронная) -----
+    async function runCheck(url) {
         if (!url) {
             errorMessage.textContent = 'Введите URL сайта.';
             errorMessage.classList.remove('hidden');
             return;
         }
+
+        // Валидация URL
         try {
             const parsed = new URL(url);
             if (!parsed.protocol.startsWith('http')) throw new Error();
@@ -163,35 +304,35 @@
             errorMessage.classList.remove('hidden');
             return;
         }
+
         errorMessage.classList.add('hidden');
         loadingIndicator.classList.remove('hidden');
         checkBtn.disabled = true;
         liveStatus.textContent = '⏳ Загрузка...';
         liveStatus.className = 'status-badge';
 
-        setTimeout(() => {
-            try {
-                const report = performInspection(url);
-                currentReport = report;
-                history.unshift(report);
-                if (history.length > 50) history.pop();
-                saveHistory();
-                renderReport(report);
-                renderHistory(currentFilter);
-                exportJsonBtn.disabled = false;
-                exportTextBtn.disabled = false;
-                liveStatus.textContent = '✅ Готово';
-                liveStatus.className = 'status-badge badge-success';
-            } catch (err) {
-                errorMessage.textContent = 'Ошибка при проверке: ' + err.message;
-                errorMessage.classList.remove('hidden');
-                liveStatus.textContent = '❌ Ошибка';
-                liveStatus.className = 'status-badge badge-danger';
-            } finally {
-                loadingIndicator.classList.add('hidden');
-                checkBtn.disabled = false;
-            }
-        }, 800);
+        try {
+            // Выполняем реальную проверку
+            const report = await performRealInspection(url);
+            currentReport = report;
+            history.unshift(report);
+            if (history.length > 50) history.pop();
+            saveHistory();
+            renderReport(report);
+            renderHistory(currentFilter);
+            exportJsonBtn.disabled = false;
+            exportTextBtn.disabled = false;
+            liveStatus.textContent = '✅ Готово';
+            liveStatus.className = 'status-badge badge-success';
+        } catch (err) {
+            errorMessage.textContent = 'Ошибка при проверке: ' + err.message;
+            errorMessage.classList.remove('hidden');
+            liveStatus.textContent = '❌ Ошибка';
+            liveStatus.className = 'status-badge badge-danger';
+        } finally {
+            loadingIndicator.classList.add('hidden');
+            checkBtn.disabled = false;
+        }
     }
 
     // ----- Отрисовка отчёта -----
@@ -204,6 +345,11 @@
 
         let html = `<div class="mb-8"><strong>🌐 URL:</strong> ${escapeHtml(url)}</div>`;
         html += `<div class="mb-8"><strong>🕒 Дата:</strong> ${new Date(timestamp).toLocaleString()}</div>`;
+        
+        if (report.error) {
+            html += `<div class="mb-8" style="color:#d1435a;"><strong>⚠️ Ошибка:</strong> ${escapeHtml(report.error)}</div>`;
+        }
+
         html += `<div class="report-grid">`;
 
         subsections.forEach(sub => {
